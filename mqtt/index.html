@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="default">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="husluo">
+
+
+    <meta name="subtitle" content="HUSLUO">
+
+
+    <meta name="description" content="EcchiYuriSexyLoveYourOppai">
+
+
+    <meta name="keywords" content="EcchiYuriSexyLoveYourOppai">
+
+
+<title>EcchiYuriSexyLoveYourOppai</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">EcchiYuriSexyLoveYourOppai</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Category</a>
+                
+                    <a class="menu-item" href="/tag">Tag</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">EcchiYuriSexyLoveYourOppai</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Category</a>
+                
+                    <a class="menu-item" href="/tag">Tag</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    <article class="post-wrap page">
+        
+        <h2 class="post-title"></h2>
+        
+        <section class="post-content">
+            
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>MQTT Web Client</title>
+    <script src="../js/mqtt.min.js"></script>
+    <style>
+        body { font-family: Arial; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .connected { background: #d4edda; color: #155724; }
+        .disconnected { background: #f8d7da; color: #721c24; }
+        button { padding: 8px 15px; margin-right: 10px; cursor: pointer; }
+        #messages { height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>MQTT Web Client</h1>
+    
+    <div id="status" class="status disconnected">未连接</div>
+    
+    <div>
+        <label>服务器地址: </label>
+        <input type="text" id="host" value="mqtt.husluo.com">
+        <label>端口: </label>
+        <input type="number" id="port" value="8083" style="width: 60px;">
+    </div>
+    
+    <div style="margin: 15px 0;">
+        <button id="connectBtn">连接</button>
+        <button id="disconnectBtn" disabled>断开</button>
+    </div>
+    
+    <div>
+        <label>订阅主题: </label>
+        <input type="text" id="subTopic" value="echo">
+        <button id="subscribeBtn" disabled>订阅</button>
+    </div>
+    
+    <div style="margin-top: 15px;">
+        <label>发布主题: </label>
+        <input type="text" id="pubTopic" value="control">
+    </div>
+    
+    <div style="margin-top: 15px;">
+        <label>发布消息: </label>
+        <input type="text" id="message" value="oled">
+        <button id="publishBtn" disabled>发布</button>
+    </div>
+    
+    <h3>接收消息:</h3>
+    <div id="messages"></div>
+
+    <script>
+        const client = {
+            mqttClient: null,
+            isConnected: false,
+            reconnectAttempts: 0,
+            
+            connect: function() {
+                const host = document.getElementById('host').value;
+                const port = document.getElementById('port').value;
+                const clientId = 'web_' + Math.random().toString(16).substr(2, 8);
+                
+                this.disconnect();
+                
+                try {
+                    this.mqttClient = mqtt.connect(`tcp://${host}/mqtt`, {
+                        clientId: clientId,
+                        port: port,
+                        protocolVersion: 4
+                    });
+                    
+                    this.bindEvents();
+                    updateStatus('正在连接...');
+                } catch (err) {
+                    this.handleError(err);
+                }
+            },
+            
+            bindEvents: function() {
+                if (!this.mqttClient) return;
+                
+                this.mqttClient.on('connect', () => {
+                    this.isConnected = true;
+                    this.reconnectAttempts = 0;
+                    updateStatus('已连接', true);
+                    enableControls(true);
+
+                if (this.mqttClient && this.isConnected) {
+                    const topic = document.getElementById('subTopic').value;
+                    this.mqttClient.subscribe(topic, { qos: 2 }, (err) => {
+                        if (!err) {
+                            addMessage('系统', `已订阅主题: ${topic}`);
+                        }
+                    });
+                }
+
+                });
+                
+                this.mqttClient.on('message', (topic, payload) => {
+                    addMessage(topic, payload.toString());
+                });
+                
+                this.mqttClient.on('error', (err) => {
+                    this.handleError(err);
+                });
+                
+                this.mqttClient.on('close', () => {
+                    if (this.isConnected) {
+                        this.reconnect();
+                    }
+                });
+            },
+            
+            disconnect: function() {
+                if (this.mqttClient) {
+                    this.mqttClient.end(true);
+                    this.mqttClient = null;
+                    this.isConnected = false;
+                    updateStatus('已断开', false);
+                    enableControls(false);
+                }
+            },
+            
+            reconnect: function() {
+                this.reconnectAttempts++;
+                const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
+                setTimeout(() => this.connect(), delay);
+            },
+            
+            handleError: function(err) {
+                console.error('[MQTT Error]', err);
+                updateStatus(err.message || '连接错误', false);
+                this.reconnect();
+            },
+            
+            subscribe: function() {
+                if (this.mqttClient && this.isConnected) {
+                    const topic = document.getElementById('subTopic').value;
+                    this.mqttClient.subscribe(topic, { qos: 2 }, (err) => {
+                        if (!err) {
+                            addMessage('系统', `已订阅主题: ${topic}`);
+                        }
+                    });
+                }
+            },
+            
+            publish: function() {
+                if (this.mqttClient && this.isConnected) {
+                    const topic = document.getElementById('pubTopic').value;
+                    const message = document.getElementById('message').value;
+                    this.mqttClient.publish(topic, message, { qos: 2 });
+                }
+            }
+        };
+        
+        function updateStatus(text, isConnected) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = text;
+            statusEl.className = isConnected ? 'status connected' : 'status disconnected';
+        }
+        
+        function enableControls(enable) {
+            document.getElementById('connectBtn').disabled = enable;
+            document.getElementById('disconnectBtn').disabled = !enable;
+            document.getElementById('subscribeBtn').disabled = !enable;
+            document.getElementById('publishBtn').disabled = !enable;
+        }
+        
+        function addMessage(topic, payload) {
+            const messagesEl = document.getElementById('messages');
+            const messageEl = document.createElement('div');
+            messageEl.innerHTML = `<strong>${topic}:</strong> ${payload}`;
+            messagesEl.appendChild(messageEl);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+        
+        document.getElementById('connectBtn').addEventListener('click', () => client.connect());
+        document.getElementById('disconnectBtn').addEventListener('click', () => client.disconnect());
+        document.getElementById('subscribeBtn').addEventListener('click', () => client.subscribe());
+        document.getElementById('publishBtn').addEventListener('click', () => client.publish());
+    </script>
+</body>
+</html>
+
+        </section>
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© husluo | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
