@@ -22,7 +22,7 @@
         <label>服务器地址: </label>
         <input type="text" id="host" value="mqtt.husluo.com">
         <label>端口: </label>
-        <input type="number" id="port" value="8084" style="width: 60px;">
+        <input type="number" id="port" value="8083" style="width: 60px;">
     </div>
     
     <div style="margin: 15px 0;">
@@ -64,7 +64,7 @@
                 this.disconnect();
                 
                 try {
-                    this.mqttClient = mqtt.connect(`ssl://${host}/mqtt`, {
+                    this.mqttClient = mqtt.connect(`tcp://${host}/mqtt`, {
                         clientId: clientId,
                         port: port,
                         protocolVersion: 4
