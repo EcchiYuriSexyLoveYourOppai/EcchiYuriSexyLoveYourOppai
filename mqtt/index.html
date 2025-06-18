@@ -2,52 +2,167 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>MQTT Web Client</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>物联网调试网页</title>
     <script src="../js/mqtt.min.js"></script>
     <style>
-        body { font-family: Arial; max-width: 800px; margin: 0 auto; padding: 20px; }
-        .status { padding: 10px; margin: 10px 0; border-radius: 4px; }
-        .connected { background: #d4edda; color: #155724; }
-        .disconnected { background: #f8d7da; color: #721c24; }
-        button { padding: 8px 15px; margin-right: 10px; cursor: pointer; }
-        #messages { height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; }
+        body {
+            font-family: Arial;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 15px;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        .status {
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        button {
+            padding: 12px 20px;
+            margin: 8px 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            min-width: 100px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background: #f5f5f5;
+            transition: background 0.2s;
+        }
+
+            button:hover {
+                background: #e0e0e0;
+            }
+
+            button:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+
+        #messages {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            background: #f9f9f9;
+        }
+
+        input {
+            padding: 10px;
+            margin: 8px 0 12px;
+            font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        label {
+            display: block;
+            margin: 12px 0 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        .button-group {
+            margin-bottom: 18px;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                padding: 20px;
+            }
+
+            button {
+                padding: 12px 24px;
+                margin: 0 10px 0 0;
+                min-width: 120px;
+            }
+
+            input {
+                width: auto;
+                min-width: 200px;
+                margin: 0 10px 0 0;
+            }
+
+            label {
+                display: inline-block;
+                margin: 0 10px 0 0;
+                padding: 0;
+                min-width: 100px;
+            }
+
+            .input-group {
+                display: flex;
+                align-items: center;
+                margin-bottom: 15px;
+            }
+
+            .button-group {
+                display: flex;
+                align-items: center;
+                margin-bottom: 15px;
+            }
+        }
+
     </style>
 </head>
 <body>
-    <h1>MQTT Web Client</h1>
-    
+    <h1>MQTT网页客户端</h1>
+
     <div id="status" class="status disconnected">未连接</div>
-    
-    <div>
-        <label>服务器地址: </label>
+
+    <div class="input-group">
+        <label>服务器地址 </label>
         <input type="text" id="host" value="mqtt.husluo.com">
-        <label>端口: </label>
-        <input type="number" id="port" value="8083" style="width: 60px;">
     </div>
-    
-    <div style="margin: 15px 0;">
+    <div class="input-group">
+        <label>端口 </label>
+        <input type="number" id="port" value="8083">
+    </div>
+
+    <div class="button-group">
         <button id="connectBtn">连接</button>
         <button id="disconnectBtn" disabled>断开</button>
     </div>
-    
-    <div>
-        <label>订阅主题: </label>
+
+    <div class="input-group">
+        <label>订阅主题 </label>
         <input type="text" id="subTopic" value="echo">
         <button id="subscribeBtn" disabled>订阅</button>
     </div>
-    
-    <div style="margin-top: 15px;">
-        <label>发布主题: </label>
+
+    <div class="input-group">
+        <label>发布主题 </label>
         <input type="text" id="pubTopic" value="control">
     </div>
-    
-    <div style="margin-top: 15px;">
-        <label>发布消息: </label>
+
+    <div class="input-group">
+        <label>发布消息 </label>
         <input type="text" id="message" value="oled">
         <button id="publishBtn" disabled>发布</button>
     </div>
-    
-    <h3>接收消息:</h3>
+
+    <h3>接收消息</h3>
     <div id="messages"></div>
 
     <script>
@@ -55,64 +170,64 @@
             mqttClient: null,
             isConnected: false,
             reconnectAttempts: 0,
-            
-            connect: function() {
+
+            connect: function () {
                 const host = document.getElementById('host').value;
                 const port = document.getElementById('port').value;
                 const clientId = 'web_' + Math.random().toString(16).substr(2, 8);
-                
+
                 this.disconnect();
-                
+
                 try {
                     this.mqttClient = mqtt.connect(`tcp://${host}/mqtt`, {
                         clientId: clientId,
                         port: port,
                         protocolVersion: 4
                     });
-                    
+
                     this.bindEvents();
                     updateStatus('正在连接...');
                 } catch (err) {
                     this.handleError(err);
                 }
             },
-            
-            bindEvents: function() {
+
+            bindEvents: function () {
                 if (!this.mqttClient) return;
-                
+
                 this.mqttClient.on('connect', () => {
                     this.isConnected = true;
                     this.reconnectAttempts = 0;
                     updateStatus('已连接', true);
                     enableControls(true);
 
-                if (this.mqttClient && this.isConnected) {
-                    const topic = document.getElementById('subTopic').value;
-                    this.mqttClient.subscribe(topic, { qos: 2 }, (err) => {
-                        if (!err) {
-                            addMessage('系统', `已订阅主题: ${topic}`);
-                        }
-                    });
-                }
+                    if (this.mqttClient && this.isConnected) {
+                        const topic = document.getElementById('subTopic').value;
+                        this.mqttClient.subscribe(topic, { qos: 2 }, (err) => {
+                            if (!err) {
+                                addMessage('系统', `订阅主题 ${topic}`);
+                            }
+                        });
+                    }
 
                 });
-                
+
                 this.mqttClient.on('message', (topic, payload) => {
                     addMessage(topic, payload.toString());
                 });
-                
+
                 this.mqttClient.on('error', (err) => {
                     this.handleError(err);
                 });
-                
+
                 this.mqttClient.on('close', () => {
                     if (this.isConnected) {
                         this.reconnect();
                     }
                 });
             },
-            
-            disconnect: function() {
+
+            disconnect: function () {
                 if (this.mqttClient) {
                     this.mqttClient.end(true);
                     this.mqttClient = null;
@@ -121,31 +236,31 @@
                     enableControls(false);
                 }
             },
-            
-            reconnect: function() {
+
+            reconnect: function () {
                 this.reconnectAttempts++;
                 const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
                 setTimeout(() => this.connect(), delay);
             },
-            
-            handleError: function(err) {
+
+            handleError: function (err) {
                 console.error('[MQTT Error]', err);
                 updateStatus(err.message || '连接错误', false);
                 this.reconnect();
             },
-            
-            subscribe: function() {
+
+            subscribe: function () {
                 if (this.mqttClient && this.isConnected) {
                     const topic = document.getElementById('subTopic').value;
                     this.mqttClient.subscribe(topic, { qos: 2 }, (err) => {
                         if (!err) {
-                            addMessage('系统', `已订阅主题: ${topic}`);
+                            addMessage('系统', `订阅主题 ${topic}`);
                         }
                     });
                 }
             },
-            
-            publish: function() {
+
+            publish: function () {
                 if (this.mqttClient && this.isConnected) {
                     const topic = document.getElementById('pubTopic').value;
                     const message = document.getElementById('message').value;
@@ -153,20 +268,20 @@
                 }
             }
         };
-        
+
         function updateStatus(text, isConnected) {
             const statusEl = document.getElementById('status');
             statusEl.textContent = text;
             statusEl.className = isConnected ? 'status connected' : 'status disconnected';
         }
-        
+
         function enableControls(enable) {
             document.getElementById('connectBtn').disabled = enable;
             document.getElementById('disconnectBtn').disabled = !enable;
             document.getElementById('subscribeBtn').disabled = !enable;
             document.getElementById('publishBtn').disabled = !enable;
         }
-        
+
         function addMessage(topic, payload) {
             const messagesEl = document.getElementById('messages');
             const messageEl = document.createElement('div');
@@ -174,7 +289,7 @@
             messagesEl.appendChild(messageEl);
             messagesEl.scrollTop = messagesEl.scrollHeight;
         }
-        
+
         document.getElementById('connectBtn').addEventListener('click', () => client.connect());
         document.getElementById('disconnectBtn').addEventListener('click', () => client.disconnect());
         document.getElementById('subscribeBtn').addEventListener('click', () => client.subscribe());
