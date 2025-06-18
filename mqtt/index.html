@@ -179,10 +179,12 @@
                 this.disconnect();
 
                 try {
-                    this.mqttClient = mqtt.connect(`wss://${host}`, {
+                    this.mqttClient = mqtt.connect(`wss://${host}:${port}/mqtt`, {
                         clientId: clientId,
-                        port: port,
-                        protocolVersion: 4
+                        username: 'your-username', // 可选
+                        password: 'your-password', // 可选
+                        clean: true,
+                        reconnectPeriod: 1000 // 断线重连间隔
                     });
 
                     this.bindEvents();
