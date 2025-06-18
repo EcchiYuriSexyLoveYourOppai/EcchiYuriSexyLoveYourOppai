@@ -179,7 +179,7 @@
                 this.disconnect();
 
                 try {
-                    this.mqttClient = mqtt.connect(`tcp://${host}/mqtt`, {
+                    this.mqttClient = mqtt.connect(`wss://${host}`, {
                         clientId: clientId,
                         port: port,
                         protocolVersion: 4
