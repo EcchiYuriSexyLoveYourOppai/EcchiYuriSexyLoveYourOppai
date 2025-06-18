@@ -133,7 +133,7 @@
 
     <div class="input-group">
         <label>服务器地址 </label>
-        <input type="text" id="host" value="tcp://mqtt.husluo.com/mqtt">
+        <input type="text" id="host" value="mqtt.husluo.com">
     </div>
     <div class="input-group">
         <label>端口 </label>
@@ -179,7 +179,7 @@
                 this.disconnect();
 
                 try {
-                    this.mqttClient = mqtt.connect(`${host}`, {
+                    this.mqttClient = mqtt.connect(`tcp://${host}/mqtt`, {
                         clientId: clientId,
                         port: port,
                         protocolVersion: 4
