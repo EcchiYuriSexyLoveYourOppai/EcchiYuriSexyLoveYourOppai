@@ -64,7 +64,7 @@
                 this.disconnect();
                 
                 try {
-                    this.mqttClient = mqtt.connect(`ssl://${host}/mqtt`, {
+                    this.mqttClient = mqtt.connect(`mqtts://${host}/mqtt`, {
                         clientId: clientId,
                         port: port,
                         protocolVersion: 4
