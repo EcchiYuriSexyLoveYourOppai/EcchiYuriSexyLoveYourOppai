@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>物联网调试网页</title>
     <script src="../js/mqtt.min.js"></script>
     <style>
@@ -10,8 +10,6 @@
             font-family: Arial;
             max-width: 800px;
             margin: 0 auto;
-            padding: 15px;
-            -webkit-text-size-adjust: 100%;
         }
 
         .status {
@@ -73,18 +71,8 @@
         }
 
         label {
-            display: block;
-            margin: 12px 0 5px;
             font-weight: bold;
             color: #333;
-        }
-
-        .input-group {
-            margin-bottom: 18px;
-        }
-
-        .button-group {
-            margin-bottom: 18px;
         }
 
         @media (min-width: 768px) {
@@ -123,7 +111,6 @@
                 margin-bottom: 15px;
             }
         }
-
     </style>
 </head>
 <body>
@@ -132,12 +119,16 @@
     <div id="status" class="status disconnected">未连接</div>
 
     <div class="input-group">
-        <label>服务器地址 </label>
-        <input type="text" id="host" value="mqtt.husluo.com">
+        <label>
+            服务器地址
+            <input type="text" id="host" value="mqtt.husluo.com">
+        </label>
     </div>
     <div class="input-group">
-        <label>端口 </label>
-        <input type="number" id="port" value="8083">
+        <label>
+            服务器端口
+            <input type="number" id="port" value="8083">
+        </label>
     </div>
 
     <div class="button-group">
@@ -146,20 +137,26 @@
     </div>
 
     <div class="input-group">
-        <label>订阅主题 </label>
-        <input type="text" id="subTopic" value="echo">
-        <button id="subscribeBtn" disabled>订阅</button>
+        <label>
+            订阅主题
+            <input type="text" id="subTopic" value="echo">
+            <button id="subscribeBtn" disabled>订阅</button>
+        </label>
     </div>
 
     <div class="input-group">
-        <label>发布主题 </label>
-        <input type="text" id="pubTopic" value="control">
+        <label>
+            发布主题
+            <input type="text" id="pubTopic" value="control">
+        </label>
     </div>
 
     <div class="input-group">
-        <label>发布消息 </label>
-        <input type="text" id="message" value="oled">
-        <button id="publishBtn" disabled>发布</button>
+        <label>
+            发布消息
+            <input type="text" id="message" value="oled">
+            <button id="publishBtn" disabled>发布</button>
+        </label>
     </div>
 
     <h3>接收消息</h3>
