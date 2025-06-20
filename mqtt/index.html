@@ -7,14 +7,16 @@
     <script src="../js/mqtt.min.js"></script>
     <style>
         body {
-            font-family: Arial;
+            font-family: Arial, sans-serif;
             max-width: 800px;
             margin: 0 auto;
-            padding: 15px;
+            padding: 20px;
+            line-height: 1.6;
         }
 
         .status {
-            padding: 10px;
+            min-width: 185px;
+            padding: 12px;
             margin: 15px 0;
             border-radius: 4px;
             font-size: 1rem;
@@ -31,15 +33,15 @@
         }
 
         button {
-            padding: 12px 20px;
-            margin: 8px 5px;
+            padding: 10px 18px;
+            margin: 0 8px 8px 0;
             cursor: pointer;
-            font-size: 1rem;
-            min-width: 100px;
+            font-size: 0.95rem;
+            min-width: 90px;
             border-radius: 4px;
             border: 1px solid #ddd;
             background: #f5f5f5;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
 
             button:hover {
@@ -55,109 +57,101 @@
             height: 300px;
             overflow-y: auto;
             border: 1px solid #ddd;
-            padding: 12px;
-            margin-top: 10px;
-            font-size: 0.9rem;
+            border-radius: 4px;
+            padding: 3px;
+            margin-top: 15px;
             background: #f9f9f9;
         }
 
-        input {
+        .sent {
+            padding: 5px;
+            background: #d4edda;
+            text-align: right;
+        }
+
+        .received {
+            padding: 5px;
+            background: #e3f2fd;
+            text-align: left;
+        }
+
+        .sender {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .time {
+            font-size: 0.5em;
+            color: #666;
+        }
+
+        input, textarea {
             padding: 10px;
-            margin: 8px 0 12px;
-            font-size: 1rem;
-            width: 100%;
-            box-sizing: border-box;
+            margin: 0 8px 8px 0;
+            font-size: 0.95rem;
             border: 1px solid #ccc;
             border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            min-height: 43px;
+            resize: none;
+            overflow-y: hidden;
+            line-height: 1.5;
+            min-width: 215px;
         }
 
         label {
             font-weight: bold;
             color: #333;
+            margin-right: 8px;
+            min-width: 80px;
+            display: inline-block;
         }
 
-        @media (min-width: 768px) {
-            body {
-                padding: 20px;
-            }
-
-            button {
-                padding: 12px 24px;
-                margin: 0 10px 0 0;
-                min-width: 120px;
-            }
-
-            input {
-                width: auto;
-                min-width: 200px;
-                margin: 0 10px 0 0;
-            }
-
-            label {
-                display: inline-block;
-                margin: 0 10px 0 0;
-                padding: 0;
-                min-width: 100px;
-            }
-
-            .input-group {
-                display: flex;
-                align-items: center;
-                margin-bottom: 15px;
-            }
-
-            .button-group {
-                display: flex;
-                align-items: center;
-                margin-bottom: 15px;
-            }
+        .input-group {
+            display: flex;
+            align-items: baseline;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
         }
     </style>
 </head>
 <body>
     <h1>MQTT网页客户端</h1>
-
     <div id="status" class="status disconnected">未连接</div>
 
     <div class="input-group">
-        <label>
-            服务器地址
-            <input type="text" id="host" value="mqtt.husluo.com">
-        </label>
-    </div>
-    <div class="input-group">
-        <label>
-            服务器端口
-            <input type="number" id="port" value="8083">
-        </label>
+        <label for="host">服务器地址</label>
+        <input type="text" id="host" value="mqtt.husluo.com">
     </div>
 
-    <div class="button-group">
+    <div class="input-group">
+        <label for="port">服务器端口</label>
+        <input type="number" id="port" value="8083">
+    </div>
+
+    <div class="input-group">
         <button id="connectBtn">连接</button>
         <button id="disconnectBtn" disabled>断开</button>
     </div>
 
     <div class="input-group">
-        <label>
-            订阅主题
-            <input type="text" id="subTopic" value="echo">
-            <button id="subscribeBtn" disabled>订阅</button>
-        </label>
+        <label for="subTopic">订阅主题</label>
+        <input type="text" id="subTopic" value="echo">
+        <button id="subscribeBtn" disabled>订阅</button>
     </div>
 
     <div class="input-group">
-        <label>
-            发布主题
-            <input type="text" id="pubTopic" value="control">
-        </label>
+        <label for="pubTopic">发布主题</label>
+        <input type="text" id="pubTopic" value="control">
     </div>
 
     <div class="input-group">
-        <label>
-            发布消息
-            <input type="text" id="message" value="oled">
-            <button id="publishBtn" disabled>发布</button>
-        </label>
+        <label for="message">发布消息</label>
+        <textarea id="message" rows="1"></textarea>
+        <button id="publishBtn" disabled>发布</button>
     </div>
 
     <h3>接收消息</h3>
@@ -262,7 +256,17 @@
                 if (this.mqttClient && this.isConnected) {
                     const topic = document.getElementById('pubTopic').value;
                     const message = document.getElementById('message').value;
-                    this.mqttClient.publish(topic, message, { qos: 2 });
+                    // 先显示本地发送的消息
+                    addMessage('我', message, true);  // 第三个参数标记为发送消息
+
+                    // 再发布到MQTT服务器
+                    this.mqttClient.publish(topic, message, { qos: 2 }, (err) => {
+                        if (err) {
+                            console.error('发布失败:', err);
+                            addMessage('系统', `消息发送失败: ${err.message}`);
+                        }
+                    });
+
                 }
             }
         };
@@ -280,10 +284,17 @@
             document.getElementById('publishBtn').disabled = !enable;
         }
 
-        function addMessage(topic, payload) {
+        function addMessage(sender, content, isSent = false) {
             const messagesEl = document.getElementById('messages');
             const messageEl = document.createElement('div');
-            messageEl.innerHTML = `<strong>${topic}:</strong> ${payload}`;
+            // 添加消息类型class
+            messageEl.className = isSent ? 'messages sent' : 'messages received';
+            messageEl.innerHTML = `
+                        <div class="sender">${sender}</div>
+                        <div class="content">${content}</div>
+                        <div class="time">${new Date().toLocaleTimeString()}</div>
+                    `;
+
             messagesEl.appendChild(messageEl);
             messagesEl.scrollTop = messagesEl.scrollHeight;
         }
@@ -292,6 +303,13 @@
         document.getElementById('disconnectBtn').addEventListener('click', () => client.disconnect());
         document.getElementById('subscribeBtn').addEventListener('click', () => client.subscribe());
         document.getElementById('publishBtn').addEventListener('click', () => client.publish());
+
+        // 文本框自动高度调整
+        const textarea = document.getElementById('message');
+        textarea.addEventListener('input', function () {
+            this.style.height = 'auto';
+            this.style.height = Math.max(40, this.scrollHeight) + 'px';
+        });
     </script>
 </body>
 </html>
