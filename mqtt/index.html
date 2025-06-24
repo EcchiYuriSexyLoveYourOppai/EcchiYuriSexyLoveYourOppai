@@ -120,13 +120,13 @@
 </head>
 <body>
     <h1>MQTT网页客户端</h1>
+
     <div id="status" class="status disconnected">未连接</div>
 
     <div class="input-group">
         <label for="host">服务器地址</label>
         <input type="text" id="host" value="mqtt.husluo.com">
     </div>
-
     <div class="input-group">
         <label for="port">服务器端口</label>
         <input type="number" id="port" value="8083">
@@ -135,6 +135,9 @@
     <div class="input-group">
         <button id="connectBtn">连接</button>
         <button id="disconnectBtn" disabled>断开</button>
+        <button id="publishBtnN" disabled>开空调</button>
+        <button id="publishBtnF" disabled>关空调</button>
+        <button id="publishBtnST" disabled>状态</button>
     </div>
 
     <div class="input-group">
@@ -142,12 +145,10 @@
         <input type="text" id="subTopic" value="echo">
         <button id="subscribeBtn" disabled>订阅</button>
     </div>
-
     <div class="input-group">
         <label for="pubTopic">发布主题</label>
         <input type="text" id="pubTopic" value="control">
     </div>
-
     <div class="input-group">
         <label for="message">发布消息</label>
         <textarea id="message" rows="1"></textarea>
@@ -166,7 +167,7 @@
             connect: function () {
                 const host = document.getElementById('host').value;
                 const port = document.getElementById('port').value;
-                const clientId = 'web_' + Math.random().toString(16).substr(2, 8);
+                const clientId = 'Web_' + getRandomHex();
 
                 this.disconnect();
 
@@ -268,8 +269,57 @@
                     });
 
                 }
+            },
+
+            publishN: function () {
+                if (this.mqttClient && this.isConnected) {
+                    const topic = document.getElementById('pubTopic').value;
+                    const message = '1on';
+                    addMessage('我', message, true);
+                    this.mqttClient.publish(topic, message, { qos: 2 }, (err) => {
+                        if (err) {
+                            addMessage('系统', `消息发送失败: ${err.message}`);
+                        }
+                    });
+
+                }
+            },
+
+            publishF: function () {
+                if (this.mqttClient && this.isConnected) {
+                    const topic = document.getElementById('pubTopic').value;
+                    const message = '1off';
+                    addMessage('我', message, true);
+                    this.mqttClient.publish(topic, message, { qos: 2 }, (err) => {
+                        if (err) {
+                            addMessage('系统', `消息发送失败: ${err.message}`);
+                        }
+                    });
+
+                }
+            },
+
+            publishST: function () {
+                if (this.mqttClient && this.isConnected) {
+                    const topic = document.getElementById('pubTopic').value;
+                    const message = 'st';
+                    addMessage('我', message, true);
+                    this.mqttClient.publish(topic, message, { qos: 2 }, (err) => {
+                        if (err) {
+                            addMessage('系统', `消息发送失败: ${err.message}`);
+                        }
+                    });
+
+                }
             }
         };
+
+
+        function getRandomHex() {
+            return Array.from(crypto.getRandomValues(new Uint8Array(4)))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+        }
 
         function updateStatus(text, isConnected) {
             const statusEl = document.getElementById('status');
@@ -282,6 +332,9 @@
             document.getElementById('disconnectBtn').disabled = !enable;
             document.getElementById('subscribeBtn').disabled = !enable;
             document.getElementById('publishBtn').disabled = !enable;
+            document.getElementById('publishBtnN').disabled = !enable;
+            document.getElementById('publishBtnF').disabled = !enable;
+            document.getElementById('publishBtnST').disabled = !enable;
         }
 
         function addMessage(sender, content, isSent = false) {
@@ -290,10 +343,10 @@
             // 添加消息类型class
             messageEl.className = isSent ? 'messages sent' : 'messages received';
             messageEl.innerHTML = `
-                        <div class="sender">${sender}</div>
-                        <div class="content">${content}</div>
-                        <div class="time">${new Date().toLocaleTimeString()}</div>
-                    `;
+                            <div class="sender">${sender}</div>
+                            <div class="content">${content}</div>
+                            <div class="time">${new Date().toLocaleTimeString()}</div>
+                        `;
 
             messagesEl.appendChild(messageEl);
             messagesEl.scrollTop = messagesEl.scrollHeight;
@@ -303,12 +356,15 @@
         document.getElementById('disconnectBtn').addEventListener('click', () => client.disconnect());
         document.getElementById('subscribeBtn').addEventListener('click', () => client.subscribe());
         document.getElementById('publishBtn').addEventListener('click', () => client.publish());
+        document.getElementById('publishBtnN').addEventListener('click', () => client.publishN());
+        document.getElementById('publishBtnF').addEventListener('click', () => client.publishF());
+        document.getElementById('publishBtnST').addEventListener('click', () => client.publishST());
 
         // 文本框自动高度调整
         const textarea = document.getElementById('message');
         textarea.addEventListener('input', function () {
             this.style.height = 'auto';
-            this.style.height = Math.max(40, this.scrollHeight) + 'px';
+            this.style.height = Math.max(43, this.scrollHeight) + 'px';
         });
     </script>
 </body>
