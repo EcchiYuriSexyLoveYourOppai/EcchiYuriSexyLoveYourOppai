@@ -273,7 +273,7 @@
 
             publishN: function () {
                 if (this.mqttClient && this.isConnected) {
-                    addMessage('我', message, true);
+                    addMessage('我', '开空调', true);
                     this.mqttClient.publishN('control', '1on', { qos: 2 }, (err) => {
                         if (err) {
                             addMessage('系统', `消息发送失败: ${err.message}`);
@@ -285,7 +285,7 @@
 
             publishF: function () {
                 if (this.mqttClient && this.isConnected) {
-                    addMessage('我', message, true);
+                    addMessage('我', '关空调', true);
                     this.mqttClient.publishF('control', '1off', { qos: 2 }, (err) => {
                         if (err) {
                             addMessage('系统', `消息发送失败: ${err.message}`);
@@ -297,7 +297,7 @@
 
             publishST: function () {
                 if (this.mqttClient && this.isConnected) {
-                    addMessage('我', message, true);
+                    addMessage('我', '状态', true);
                     this.mqttClient.publishST('control', 'st', { qos: 2 }, (err) => {
                         if (err) {
                             addMessage('系统', `消息发送失败: ${err.message}`);
