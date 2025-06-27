@@ -273,10 +273,8 @@
 
             publishN: function () {
                 if (this.mqttClient && this.isConnected) {
-                    const topic = document.getElementById('pubTopic').value;
-                    const message = '1on';
                     addMessage('我', message, true);
-                    this.mqttClient.publish(topic, message, { qos: 2 }, (err) => {
+                    this.mqttClient.publish('control', '1on', { qos: 2 }, (err) => {
                         if (err) {
                             addMessage('系统', `消息发送失败: ${err.message}`);
                         }
@@ -287,10 +285,8 @@
 
             publishF: function () {
                 if (this.mqttClient && this.isConnected) {
-                    const topic = document.getElementById('pubTopic').value;
-                    const message = '1off';
                     addMessage('我', message, true);
-                    this.mqttClient.publish(topic, message, { qos: 2 }, (err) => {
+                    this.mqttClient.publish('control', '1off', { qos: 2 }, (err) => {
                         if (err) {
                             addMessage('系统', `消息发送失败: ${err.message}`);
                         }
@@ -301,10 +297,8 @@
 
             publishST: function () {
                 if (this.mqttClient && this.isConnected) {
-                    const topic = document.getElementById('pubTopic').value;
-                    const message = 'st';
                     addMessage('我', message, true);
-                    this.mqttClient.publish(topic, message, { qos: 2 }, (err) => {
+                    this.mqttClient.publish('control', 'st', { qos: 2 }, (err) => {
                         if (err) {
                             addMessage('系统', `消息发送失败: ${err.message}`);
                         }
