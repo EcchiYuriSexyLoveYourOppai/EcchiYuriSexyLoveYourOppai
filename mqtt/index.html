@@ -274,7 +274,7 @@
             publishN: function () {
                 if (this.mqttClient && this.isConnected) {
                     addMessage('我', message, true);
-                    this.mqttClient.publish('control', '1on', { qos: 2 }, (err) => {
+                    this.mqttClient.publishN('control', '1on', { qos: 2 }, (err) => {
                         if (err) {
                             addMessage('系统', `消息发送失败: ${err.message}`);
                         }
@@ -286,7 +286,7 @@
             publishF: function () {
                 if (this.mqttClient && this.isConnected) {
                     addMessage('我', message, true);
-                    this.mqttClient.publish('control', '1off', { qos: 2 }, (err) => {
+                    this.mqttClient.publishF('control', '1off', { qos: 2 }, (err) => {
                         if (err) {
                             addMessage('系统', `消息发送失败: ${err.message}`);
                         }
@@ -298,7 +298,7 @@
             publishST: function () {
                 if (this.mqttClient && this.isConnected) {
                     addMessage('我', message, true);
-                    this.mqttClient.publish('control', 'st', { qos: 2 }, (err) => {
+                    this.mqttClient.publishST('control', 'st', { qos: 2 }, (err) => {
                         if (err) {
                             addMessage('系统', `消息发送失败: ${err.message}`);
                         }
